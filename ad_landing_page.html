@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watch Ad</title>
+<meta name="monetag" content="c9d46ae65cb2ffae137d579939989bd7">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #fff;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  #ad-slot {
+    min-height: 150px;
+    background: #222;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    padding: 20px;
+  }
+  #timer {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  #continue-btn, #open-ad-btn {
+    display: none;
+    padding: 14px 32px;
+    font-size: 18px;
+    background: #2ea043;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    margin: 10px;
+  }
+  #continue-btn.show, #open-ad-btn.show {
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+  <h2>🎬 Ad দেখো</h2>
+
+  <div id="ad-slot">
+    <p id="ad-status">অ্যাড খুলতে নিচের বাটনে ক্লিক করো 👇</p>
+  </div>
+
+  <a id="open-ad-btn" class="show" href="#">▶️ Open Ad</a>
+
+  <div id="timer" style="display:none;">অপেক্ষা করো: <span id="seconds">15</span> সেকেন্ড</div>
+  <a id="continue-btn" href="#">✅ Continue to Bot</a>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const botUsername = params.get("bot");
+    let seconds = parseInt(params.get("wait") || "15", 10);
+
+    const secondsEl = document.getElementById("seconds");
+    const timerEl = document.getElementById("timer");
+    const continueBtn = document.getElementById("continue-btn");
+    const openAdBtn = document.getElementById("open-ad-btn");
+    const adStatus = document.getElementById("ad-status");
+
+    // Monetag Direct Link এখানে বসাও (বটের config.py এর MONETAG_DIRECT_LINK এর মতো একই লিংক)
+    const MONETAG_LINK = "https://your-monetag-direct-link-here.com";
+
+    function startCountdown() {
+      openAdBtn.classList.remove("show");
+      adStatus.textContent = "অ্যাড দেখা হচ্ছে, এই পেজে ফিরে আসো...";
+      timerEl.style.display = "block";
+
+      const countdown = setInterval(() => {
+        seconds -= 1;
+        secondsEl.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(countdown);
+          timerEl.style.display = "none";
+          if (token && botUsername) {
+            continueBtn.href = `https://t.me/${botUsername}?start=ad_${token}`;
+            continueBtn.classList.add("show");
+            adStatus.textContent = "✅ শেষ! এখন নিচের বাটনে ক্লিক করে বটে ফিরে যাও।";
+          } else {
+            adStatus.textContent = "❌ লিংক সঠিক না। বট থেকে আবার /watchad দাও।";
+          }
+        }
+      }, 1000);
+    }
+
+    openAdBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.open(MONETAG_LINK, "_blank");
+      startCountdown();
+    });
+  </script>
+
+</body>
+</html>
